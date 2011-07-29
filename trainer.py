@@ -21,11 +21,11 @@ class KanjiTrainer:
         mainloop()
 
     def make_buttons(self):
-        nxt = Button(self.root, text='Next', command=self.next)
+        nxt = Button(self.root, text='Next', command=self.next, state='disabled')
         nxt.pack()
-        rev = Button(self.root, text='Reveal', command=self.reveal)
+        rev = Button(self.root, text='Reveal', command=self.reveal, state='disabled')
         rev.pack()
-
+        
     def make_menus(self):
         menubar = Menu(self.root)
 
@@ -56,6 +56,7 @@ class KanjiTrainer:
     def open_file(self):
         f = tkFileDialog.askopenfile()
         self.load_file(f)
+        self.enable_buttons()
 
     def load_file(self, fle):
         s = fle.read().split('\n')[:-1] # last line is empty
@@ -63,6 +64,9 @@ class KanjiTrainer:
         for k_set in s:
             print k_set
             self.kanji.append(k_set.split(' '))
+
+    def enable_buttons():
+        print 'enable'
         
     def next(self):
         self.display(self.canvas, random.randint(0,len(self.kanji) - 1))
