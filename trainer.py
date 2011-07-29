@@ -8,24 +8,41 @@ global canvas
 class KanjiTrainer:
 
     def __init__(self, klist):    
+        self.create_gui()
+
+    def create_gui(self):
         self.root = Tk()
         self.root.title('Kanji Trainer')
+        self.make_buttons()
+        self.make_menus()
+        self.canvas = Canvas(self.root, height=400, width=400)
+        self.canvas.pack()
+        self.centre_window()
+        mainloop()
+
+    def make_buttons(self):
         nxt = Button(self.root, text='Next', command=self.next)
         nxt.pack()
         shw = Button(self.root, text='Reveal', command=self.reveal)
         shw.pack()
-        self.opt_var = ''
+
+    def make_menus(self):
         menubar = Menu(self.root)
+
         filemenu = Menu(menubar, tearoff=0)
         filemenu.add_command(label='Open', command=self.open_file)
         filemenu.add_separator()
         filemenu.add_command(label='Exit', command=self.root.quit)
         menubar.add_cascade(label='File', menu=filemenu)
+
+        optmenu = Menu(menubar, tearoff=0)
+        optmenu.add_command(label='Properties', command=self.set_props)
+        menubar.add_cascade(label='Options', menu=optmenu)
+
         self.root.config(menu=menubar)
-        self.canvas = Canvas(self.root, height=400, width=400)
-        self.canvas.pack()
-        self.centre_window()
-        self.canvas.mainloop()
+        
+    def set_props(self):
+        print 'props'
 
     def centre_window(self):
         window_height = self.root.winfo_screenheight()
