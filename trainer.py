@@ -7,14 +7,8 @@ global canvas
 
 class KanjiTrainer:
 
-    def __init__(self):
-        f = open(sys.argv[1])
-        s = f.read().split('\n')[:-1] # last line is empty
-        global kanji
-        global canvas
-        kanji = []
-        for k_set in s:
-            kanji.append(k_set.split(' '))
+    def __init__(self, klist):
+        
     
         m = Tk()
         m.title('Kanji Trainer')
@@ -33,15 +27,20 @@ class KanjiTrainer:
     
         nxt = Button(m, text='Next', command=self.next)
         nxt.pack()
+        shw = Button(m, text='Reveal', command=self.reveal)
+        shw.pack()
         c = Canvas(m, height=400, width=400)
         c.pack()
         
-        canvas = c
+        self.canvas = c
         c.mainloop()
 
     def next(self):
         r = random.randint(0,len(kanji) - 1)
-        self.display(canvas, r)
+        self.display(self.canvas, r)
+
+    def reveal(self):
+        self.canvas.itemconfigure('hiragana', state='normal')
     
     def display(self, canvas, index):
         big = ('Meiryo', 90, 'normal')
@@ -52,7 +51,13 @@ class KanjiTrainer:
             disp += '%s\n'%(h)
             canvas.delete('all')
             canvas.create_text((int(canvas.cget('width'))/2,int(canvas.cget('height'))/4), text=k, font=big, tags='kanji')
-            canvas.create_text((int(canvas.cget('width'))/2,2*int(canvas.cget('height'))/3), text=disp, font=small, tags='hiragana')
+            canvas.create_text((int(canvas.cget('width'))/2,2*int(canvas.cget('height'))/3), text=disp, font=small, tags='hiragana', state='hidden')
 
 if __name__ == '__main__':
-    KanjiTrainer()
+    f = open(sys.argv[1])
+    s = f.read().split('\n')[:-1] # last line is empty
+    kanji = []
+    for k_set in s:
+        kanji.append(k_set.split(' '))
+            
+    KanjiTrainer(kanji)
