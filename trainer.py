@@ -37,6 +37,13 @@ def main():
     wh = m.winfo_screenheight()
     ww = m.winfo_screenwidth()
     
+    w = 400
+    h = 400
+    x = (ww/2) - (w/2)
+    y = (wh/2) - (h/2)
+    print x, y
+    
+    m.geometry("%dx%d+%d+%d"%(w,h,x,y))
     
     
     nxt = Button(m, text='Next', command=next)
