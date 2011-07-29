@@ -1,0 +1,1 @@
+this program is intended to become a sort of flashcard program. It should use a list of kanji readings from somewhere, most likely in an xml file, and then then randomly choose from this list and ask questions about the kanji displayed, or about a reading or meaning.
