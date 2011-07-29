@@ -14,6 +14,14 @@ class KanjiTrainer:
         nxt.pack()
         shw = Button(self.root, text='Reveal', command=self.reveal)
         shw.pack()
+        self.opt_var = ''
+        menubar = Menu(self.root)
+        filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label='Open', command=self.open_file)
+        filemenu.add_separator()
+        filemenu.add_command(label='Exit', command=self.root.quit)
+        menubar.add_cascade(label='File', menu=filemenu)
+        self.root.config(menu=menubar)
         self.canvas = Canvas(self.root, height=400, width=400)
         self.canvas.pack()
         self.centre_window()
@@ -27,6 +35,9 @@ class KanjiTrainer:
         x = (window_width/2) - (w/2)
         y = (window_height/2) - (h/2)
         self.root.geometry("%dx%d+%d+%d"%(w,h,x,y))
+
+    def open_file(self):
+        print 'opening'
     
     def next(self):
         self.display(self.canvas, random.randint(0,len(kanji) - 1))
@@ -46,6 +57,7 @@ class KanjiTrainer:
         canvas.delete('all')
         canvas.create_text(cwidth/2, cheight/4, text=k, font=big, tags='kanji')
         canvas.create_text(cwidth/2, cheight/2 - 20, text=disp, font=small, tags='hiragana', state='hidden', anchor='n')
+        self.root.after(5000, self.reveal)
 
 if __name__ == '__main__':
     s = open(sys.argv[1]).read().split('\n')[:-1] # last line is empty
