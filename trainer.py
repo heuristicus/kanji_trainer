@@ -10,15 +10,15 @@ def next():
     display(canvas, r)
     
 def display(canvas, index):
-    big = ('Meiryo', 40, 'normal')
+    big = ('Meiryo', 90, 'normal')
     small = ('Meiryo', 18, 'normal')
     k = kanji[index][0]
     disp = ''
     for h in kanji[index][1:]:
         disp += '%s\n'%(h)
     canvas.delete('all')
-    canvas.create_text((10,10), text=k, font=big, tags='kanji', anchor='nw')
-    canvas.create_text((100,100), text=disp, font=small, anchor='nw', tags='hiragana')
+    canvas.create_text((int(canvas.cget('width'))/2,int(canvas.cget('height'))/4), text=k, font=big, tags='kanji')
+    canvas.create_text((int(canvas.cget('width'))/2,2*int(canvas.cget('height'))/3), text=disp, font=small, tags='hiragana')
 
 def main():
     """Runs when the file is run from the commandline
@@ -33,6 +33,7 @@ def main():
         kanji.append(k_set.split(' '))
     
     m = Tk()
+    m.title('Kanji Trainer')
 
     wh = m.winfo_screenheight()
     ww = m.winfo_screenwidth()
@@ -50,6 +51,7 @@ def main():
     nxt.pack()
     c = Canvas(m, height=400, width=400)
     c.pack()
+    
     canvas = c
     c.mainloop()
 
