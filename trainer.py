@@ -1,15 +1,15 @@
 #!/usr/bin/python
 import sys, random
 from Tkinter import *
-
-global kanji
-global canvas
+import tkFileDialog
 
 class KanjiTrainer:
 
-    def __init__(self, klist):    
+    def __init__(self, fname=''):
         self.create_gui()
-
+        if fname:
+            self.load_file(fname)
+        
     def create_gui(self):
         self.root = Tk()
         self.root.title('Kanji Trainer')
@@ -23,8 +23,8 @@ class KanjiTrainer:
     def make_buttons(self):
         nxt = Button(self.root, text='Next', command=self.next)
         nxt.pack()
-        shw = Button(self.root, text='Reveal', command=self.reveal)
-        shw.pack()
+        rev = Button(self.root, text='Reveal', command=self.reveal)
+        rev.pack()
 
     def make_menus(self):
         menubar = Menu(self.root)
@@ -54,10 +54,18 @@ class KanjiTrainer:
         self.root.geometry("%dx%d+%d+%d"%(w,h,x,y))
 
     def open_file(self):
-        print 'opening'
-    
+        f = tkFileDialog.askopenfile()
+        self.load_file(f)
+
+    def load_file(self, fle):
+        s = fle.read().split('\n')[:-1] # last line is empty
+        self.kanji = []
+        for k_set in s:
+            print k_set
+            self.kanji.append(k_set.split(' '))
+        
     def next(self):
-        self.display(self.canvas, random.randint(0,len(kanji) - 1))
+        self.display(self.canvas, random.randint(0,len(self.kanji) - 1))
 
     def reveal(self):
         self.canvas.itemconfigure('hiragana', state='normal')
@@ -67,18 +75,23 @@ class KanjiTrainer:
         small = ('Meiryo', 18, 'normal')
         cheight = int(canvas.cget('height'))
         cwidth = int(canvas.cget('width'))
-        k = kanji[index][0]
+        k = self.kanji[index][0]
         disp = ''
-        for h in kanji[index][1:]:
+        for h in self.kanji[index][1:]:
             disp += '%s\n'%(h)
         canvas.delete('all')
         canvas.create_text(cwidth/2, cheight/4, text=k, font=big, tags='kanji')
         canvas.create_text(cwidth/2, cheight/2 - 20, text=disp, font=small, tags='hiragana', state='hidden', anchor='n')
-        self.root.after(5000, self.reveal)
+
+def main():
+    kfile = ''
+    try:
+        kfile = sys.argv[1]
+    except IndexError:
+        pass
+    
+    KanjiTrainer(kfile)
 
 if __name__ == '__main__':
-    s = open(sys.argv[1]).read().split('\n')[:-1] # last line is empty
-    kanji = []
-    for k_set in s:
-        kanji.append(k_set.split(' '))
-    KanjiTrainer(kanji)
+    main()
+    
