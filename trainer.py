@@ -43,9 +43,9 @@ class KanjiTrainer:
         disp = ''
         for h in kanji[index][1:]:
             disp += '%s\n'%(h)
-            canvas.delete('all')
-            canvas.create_text(cwidth/2, cheight/4, text=k, font=big, tags='kanji')
-            canvas.create_text(cwidth/2, 2*cheight/3, text=disp, font=small, tags='hiragana', state='hidden')
+        canvas.delete('all')
+        canvas.create_text(cwidth/2, cheight/4, text=k, font=big, tags='kanji')
+        canvas.create_text(cwidth/2, cheight/2 - 20, text=disp, font=small, tags='hiragana', state='hidden', anchor='n')
 
 if __name__ == '__main__':
     s = open(sys.argv[1]).read().split('\n')[:-1] # last line is empty
