@@ -6,22 +6,26 @@ global kanji
 global canvas
 
 def next():
-    r = random.randomint(0,len(kanji))
-    print r
+    r = random.randint(0,len(kanji) - 1)
     display(canvas, r)
     
-
 def display(canvas, index):
-    #c.create_text((10,10), text=kanji[index][0], font=ft, tags='kanji')
+    big = ('Meiryo', 40, 'normal')
+    small = ('Meiryo', 18, 'normal')
+    k = kanji[index][0]
+    disp = ''
     for h in kanji[index][1:]:
-        print h
+        disp += '%s\n'%(h)
+    canvas.delete('all')
+    canvas.create_text((10,10), text=k, font=big, tags='kanji', anchor='nw')
+    canvas.create_text((100,100), text=disp, font=small, anchor='nw', tags='hiragana')
 
 def main():
     """Runs when the file is run from the commandline
     """
-    ft = ('Meiryo', 40, 'normal')
+    
     f = open(sys.argv[1])
-    s = f.read().split('\n')
+    s = f.read().split('\n')[:-1] # last line is empty
     global kanji
     global canvas
     kanji = []
@@ -29,13 +33,19 @@ def main():
         kanji.append(k_set.split(' '))
     
     m = Tk()
+
+    wh = m.winfo_screenheight()
+    ww = m.winfo_screenwidth()
+    
+    
+    
     nxt = Button(m, text='Next', command=next)
     nxt.pack()
-    c = Canvas(m)
+    c = Canvas(m, height=400, width=400)
     c.pack()
     canvas = c
-    c.create_text((10,10), text=kanji[0][0], font=ft, tags='kanji')
     c.mainloop()
+
     
 if __name__ == '__main__':
 
