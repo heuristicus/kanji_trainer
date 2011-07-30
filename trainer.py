@@ -47,17 +47,28 @@ class KanjiTrainer:
         self.prop = Toplevel(self.root)
         self.prop.resizable(width=False, height=False)
 
-        Button(self.prop, text='Apply', command=self.apply_setting).grid(row=3, column=1, sticky='E')
-        Button(self.prop, text='Cancel', command=self.prop.destroy).grid(row=3, column=2)
-        Entry(self.prop, validate='key', width=5, vcmd=self.validate_props, state='disabled').grid(row=1, column=1, sticky='W')
-        Label(self.prop, text='Reveal delay:').grid(row=1, column=0, sticky='E')
+        self.app = Button(self.prop, text='Apply', command=self.apply_setting)
+        self.app.grid(row=3, column=1, sticky='E')
+        self.can = Button(self.prop, text='Cancel', command=self.prop.destroy)
+        self.can.grid(row=3, column=2)
+        self.rve = Entry(self.prop, validate='key', width=5, vcmd=self.validate_props, state='disabled')
+        self.rve.grid(row=1, column=1, sticky='W')
+        self.revdel = Label(self.prop, text='Reveal delay:')
+        self.revdel.grid(row=1, column=0, sticky='E')
         self.reveal_chk = 0
-        Checkbutton(self.prop, text="Automatically reveal", variable=self.reveal_chk, command=self.rev_timer).grid(row=0, columnspan=2)
+        self.chk = Checkbutton(self.prop, text="Automatically reveal", variable=self.reveal_chk, command=self.rev_timer)
+        self.chk.grid(row=0, columnspan=2)
 
         self.prop.geometry('+%d+%d'%(self.root.winfo_rootx(), self.root.winfo_rooty()))
 
     def rev_timer(self):
-        print 'timer'
+        cur_state = str(self.rve.config()['state'][-1])
+        if cur_state == 'disabled':
+            print 'enabling'
+            self.rve.config(state='normal')
+        else:
+            print 'disabling'
+            self.rve.config(state='disabled')
 
     def validate_props(self):
         print 'val'
