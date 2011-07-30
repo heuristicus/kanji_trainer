@@ -15,6 +15,7 @@ class KanjiTrainer:
     def create_gui(self):
         self.root = Tk()
         self.root.title('Kanji Trainer')
+        self.root.resizable()
         self.make_buttons()
         self.make_menus()
         self.canvas = Canvas(self.root, height=400, width=400)
