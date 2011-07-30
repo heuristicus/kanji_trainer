@@ -7,8 +7,11 @@ class KanjiTrainer:
 
     def __init__(self, fname=''):
         self.create_gui()
+        print fname
         if fname:
-            self.load_file(fname)
+            print 'opening'
+            self.open_file(fname)
+        mainloop()
         
     def create_gui(self):
         self.root = Tk()
@@ -18,8 +21,7 @@ class KanjiTrainer:
         self.canvas = Canvas(self.root, height=400, width=400)
         self.canvas.pack()
         self.centre_window()
-        mainloop()
-
+        
     def make_buttons(self):
         nxt = Button(self.root, text='Next', command=self.next, state='disabled')
         nxt.pack()
@@ -53,21 +55,28 @@ class KanjiTrainer:
         y = (window_height/2) - (h/2)
         self.root.geometry("%dx%d+%d+%d"%(w,h,x,y))
 
-    def open_file(self):
-        f = tkFileDialog.askopenfile()
+    def open_file(self, fname=''):
+        if not fname:
+            f = tkFileDialog.askopenfile()
+        else:
+            f = open(fname, 'r')
         self.load_file(f)
-        self.enable_buttons()
-
+     
     def load_file(self, fle):
         s = fle.read().split('\n')[:-1] # last line is empty
         self.kanji = []
         for k_set in s:
-            print k_set
             self.kanji.append(k_set.split(' '))
+        self.enable_buttons()
 
-    def enable_buttons():
-        print 'enable'
-        
+    def enable_buttons(self):
+        print 'enabling buttons'
+        obj = self.root.__dict__.get('children')
+        for key in obj:
+            item = obj[key]
+            if item.__class__.__name__ is 'Button':
+                item.config(state='normal')
+                                         
     def next(self):
         self.display(self.canvas, random.randint(0,len(self.kanji) - 1))
 
@@ -93,8 +102,7 @@ def main():
         kfile = sys.argv[1]
     except IndexError:
         pass
-    
-    KanjiTrainer(kfile)
+    KanjiTrainer(fname=kfile)
 
 if __name__ == '__main__':
     main()
