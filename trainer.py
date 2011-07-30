@@ -7,7 +7,6 @@ class KanjiTrainer:
 
     def __init__(self, fname=''):
         self.create_gui()
-        print fname
         if fname:
             print 'opening'
             self.open_file(fname)
@@ -112,9 +111,11 @@ class KanjiTrainer:
      
     def load_file(self, fle):
         s = fle.read().split('\n')[:-1] # last line is empty
-        self.kanji = []
+        kanji = []
         for k_set in s:
-            self.kanji.append(k_set.split(' '))
+            kanji.append(k_set.split(' '))
+
+        self.logic = Logic(kanji)
         self.enable_buttons()
 
     def enable_buttons(self):
@@ -126,23 +127,32 @@ class KanjiTrainer:
                 item.config(state='normal')
                                          
     def next(self):
-        self.display(self.canvas, random.randint(0,len(self.kanji) - 1))
+        self.display(self.canvas, self.logic.next_kanji())
 
     def reveal(self):
         self.canvas.itemconfigure('hiragana', state='normal')
     
-    def display(self, canvas, index):
+    def display(self, canvas, kanji):
         big = ('Meiryo', 90, 'normal')
         small = ('Meiryo', 18, 'normal')
         cheight = int(canvas.cget('height'))
         cwidth = int(canvas.cget('width'))
-        k = self.kanji[index][0]
+        k = kanji[0]
         disp = ''
-        for h in self.kanji[index][1:]:
+        for h in kanji[1:]:
             disp += '%s\n'%(h)
         canvas.delete('all')
         canvas.create_text(cwidth/2, cheight/4, text=k, font=big, tags='kanji')
         canvas.create_text(cwidth/2, cheight/2 - 20, text=disp, font=small, tags='hiragana', state='hidden', anchor='n')
+
+
+class Logic():
+    
+    def __init__(self, kanji_list):
+        self.kanji = kanji_list
+
+    def next_kanji(self):
+        return self.kanji[random.randint(0,len(self.kanji) - 1)]
 
 def main():
     kfile = ''
