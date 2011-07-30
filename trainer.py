@@ -38,13 +38,33 @@ class KanjiTrainer:
         menubar.add_cascade(label='File', menu=filemenu)
 
         optmenu = Menu(menubar, tearoff=0)
-        optmenu.add_command(label='Properties', command=self.set_props)
+        optmenu.add_command(label='Properties', command=self.display_props)
         menubar.add_cascade(label='Options', menu=optmenu)
 
         self.root.config(menu=menubar)
         
-    def set_props(self):
-        print 'props'
+    def display_props(self):
+        self.prop = Toplevel(self.root)
+        self.prop.resizable(width=False, height=False)
+
+        Button(self.prop, text='Apply', command=self.apply_setting).grid(row=3, column=1, sticky='E')
+        Button(self.prop, text='Cancel', command=self.prop.destroy).grid(row=3, column=2)
+        Entry(self.prop, validate='key', width=5, vcmd=self.validate_props, state='disabled').grid(row=1, column=1, sticky='W')
+        Label(self.prop, text='Reveal delay:').grid(row=1, column=0, sticky='E')
+        self.reveal_chk = 0
+        Checkbutton(self.prop, text="Automatically reveal", variable=self.reveal_chk, command=self.rev_timer).grid(row=0, columnspan=2)
+
+        self.prop.geometry('+%d+%d'%(self.root.winfo_rootx(), self.root.winfo_rooty()))
+
+    def rev_timer(self):
+        print 'timer'
+
+    def validate_props(self):
+        print 'val'
+        return True
+
+    def apply_setting(self):
+        print 'applying'
 
     def centre_window(self):
         window_height = self.root.winfo_screenheight()
