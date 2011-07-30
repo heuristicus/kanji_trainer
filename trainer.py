@@ -46,12 +46,14 @@ class KanjiTrainer:
     def display_props(self):
         self.prop = Toplevel(self.root)
         self.prop.resizable(width=False, height=False)
-
+        
         self.app = Button(self.prop, text='Apply', command=self.apply_setting)
         self.app.grid(row=3, column=1, sticky='E')
         self.can = Button(self.prop, text='Cancel', command=self.prop.destroy)
         self.can.grid(row=3, column=2)
-        self.rve = Entry(self.prop, validate='key', width=5, vcmd=self.validate_props, state='disabled')
+
+        validate = (self.prop.register(self.validate_props), '%i')
+        self.rve = Entry(self.prop, validate='key', width=5, vcmd=validate, state='disabled')
         self.rve.grid(row=1, column=1, sticky='W')
         self.revdel = Label(self.prop, text='Reveal delay:')
         self.revdel.grid(row=1, column=0, sticky='E')
@@ -64,16 +66,15 @@ class KanjiTrainer:
     def rev_timer(self):
         cur_state = str(self.rve.config()['state'][-1])
         if cur_state == 'disabled':
-            print 'enabling'
             self.rve.config(state='normal')
         else:
-            print 'disabling'
             self.rve.config(state='disabled')
 
-    def validate_props(self):
-        print 'val'
-        return True
-
+    def validate_props(self, i):
+       if int(i) > 2:
+           return False
+       return True
+        
     def apply_setting(self):
         print 'applying'
 
