@@ -15,16 +15,20 @@ class KanjiTrainer:
     def create_gui(self):
         self.root = Tk()
         self.root.title('Kanji Trainer')
-        self.root.resizable()
+        
         self.make_buttons()
         self.make_menus()
+        self.setup_vars()
         self.canvas = Canvas(self.root, height=400, width=400)
+        self.root.bind('<Right>', self.kbd_next)
         self.canvas.pack()
         self.centre_window()
 
     def setup_vars(self):
         self.delay_active = False
         self.reveal_delay = -1
+        self.revealed = False
+        self.logic = None
         
     def make_buttons(self):
         nxt = Button(self.root, text='Next', command=self.next, state='disabled')
@@ -127,10 +131,20 @@ class KanjiTrainer:
             if item.__class__.__name__ is 'Button':
                 item.config(state='normal')
                                          
+    def kbd_next(self, event):
+        if not self.logic:
+            return
+        if self.revealed:
+            self.next()
+        else:
+            self.reveal()
+
     def next(self):
+        self.revealed = False
         self.display(self.canvas, self.logic.next_kanji())
 
     def reveal(self):
+        self.revealed = True
         self.canvas.itemconfigure('hiragana', state='normal')
     
     def display(self, canvas, kanji):
