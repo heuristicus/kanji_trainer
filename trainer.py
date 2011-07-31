@@ -52,52 +52,8 @@ class KanjiTrainer:
         self.root.config(menu=menubar)
         
     def display_props(self):
-        self.prop = Toplevel(self.root)
-        self.prop.resizable(width=False, height=False)
+        Properties(self, self.root)
         
-        self.app = Button(self.prop, text='Apply', command=self.apply_settings)
-        self.app.grid(row=3, column=1, sticky='E')
-        self.can = Button(self.prop, text='Cancel', command=self.prop.destroy)
-        self.can.grid(row=3, column=2)
-        
-        validate = (self.prop.register(self.validate_props), '%i')
-        self.rve = Entry(self.prop, validate='key', width=5, vcmd=validate, state='disabled')
-        self.rve.grid(row=1, column=1, sticky='W')
-        self.revdel = Label(self.prop, text='Reveal delay:')
-        self.revdel.grid(row=1, column=0, sticky='E')
-        self.reveal_chk = IntVar()
-        self.chk = Checkbutton(self.prop, text="Automatically reveal", variable=self.reveal_chk, command=self.rev_timer)
-        self.chk.grid(row=0, columnspan=2)
-
-        self.prop.geometry('+%d+%d'%(self.root.winfo_rootx(), self.root.winfo_rooty()))
-
-    def rev_timer(self):
-        cur_state = str(self.rve.config()['state'][-1])
-        if cur_state == 'disabled':
-            self.rve.config(state='normal')
-        else:
-            self.rve.config(state='disabled')
-
-    def validate_props(self, i):
-        if int(i) > 2:
-            return False
-        return True
-        
-    def apply_settings(self):
-        time = 0
-        if self.reveal_chk.get() is not 0:
-            time = self.rve.get()
-            try:
-                int(time)
-            except ValueError:
-                tkMessageBox.showwarning('Set delay', 'Delay must be a number.', parent=self.prop)
-                return
-            self.reveal_delay = time
-            self.delay_active = True
-        else:
-            self.reveal_delay = -1
-            self.delay_active = False
-
     def centre_window(self):
         window_height = self.root.winfo_screenheight()
         window_width = self.root.winfo_screenwidth()
@@ -132,6 +88,7 @@ class KanjiTrainer:
                 item.config(state='normal')
                                          
     def kbd_next(self, event):
+        print self.delay_active, self.reveal_delay
         if not self.logic:
             return
         if self.revealed:
@@ -160,6 +117,64 @@ class KanjiTrainer:
         canvas.create_text(cwidth/2, cheight/4, text=k, font=big, tags='kanji')
         canvas.create_text(cwidth/2, cheight/2 - 20, text=disp, font=small, tags='hiragana', state='hidden', anchor='n')
 
+class Properties():
+    
+    def __init__(self, parent, root):
+        self.parent = parent # reference to the object that spawned this
+        self.prop = Toplevel(root)
+        self.prop.resizable(width=False, height=False)
+        
+        self.app = Button(self.prop, text='Apply', command=self.apply_settings)
+        self.app.grid(row=3, column=1, sticky='E')
+        self.app = Button(self.prop, text='OK', command=self.ok)
+        self.app.grid(row=3, column=1, sticky='E')
+        self.can = Button(self.prop, text='Cancel', command=self.prop.destroy)
+        self.can.grid(row=3, column=2)
+        
+        validate = (self.prop.register(self.validate_props), '%i')
+        self.rve = Entry(self.prop, validate='key', width=5, vcmd=validate, state='disabled')
+        self.rve.grid(row=1, column=1, sticky='W')
+        self.revdel = Label(self.prop, text='Reveal delay:')
+        self.revdel.grid(row=1, column=0, sticky='E')
+        self.reveal_chk = IntVar()
+        self.chk = Checkbutton(self.prop, text="Automatically reveal", variable=self.reveal_chk, command=self.rev_timer)
+        self.chk.grid(row=0, columnspan=2)
+
+        self.prop.geometry('+%d+%d'%(root.winfo_rootx(), root.winfo_rooty()))
+
+
+    def rev_timer(self):
+        """Called when the automatically reveal checkbox is ticked in
+        order to enable or disable the entry box"""
+        cur_state = str(self.rve.config()['state'][-1])
+        if cur_state == 'disabled':
+            self.rve.config(state='normal')
+        else:
+            self.rve.config(state='disabled')
+
+    def validate_props(self, i):
+        if int(i) > 2:
+            return False
+        return True
+
+    def ok(self):
+        self.parent.reveal_delay = self.reveal_delay
+        self.parent.delay_active = self.delay_active
+        self.prop.destroy()
+
+    def apply_settings(self):
+        if self.reveal_chk.get() is not 0:
+            time = self.rve.get()
+            try:
+                int(time)
+            except ValueError:
+                tkMessageBox.showwarning('Set delay', 'Delay must be a number.', parent=self.prop)
+                return
+            self.reveal_delay = time
+            self.delay_active = True
+        else:
+            self.reveal_delay = -1
+            self.delay_active = False
 
 class Logic():
     
