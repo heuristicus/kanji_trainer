@@ -22,6 +22,7 @@ class KanjiTrainer:
         self.canvas = Canvas(self.root, height=400, width=400)
         self.root.bind('<Right>', self.kbd_next)
         self.canvas.pack()
+        
         self.centre_window()
 
     def setup_vars(self):
@@ -29,6 +30,7 @@ class KanjiTrainer:
         self.reveal_delay = -1
         self.revealed = False
         self.logic = None
+        self.after = None
         
     def make_buttons(self):
         nxt = Button(self.root, text='Next', command=self.next, state='disabled')
@@ -52,6 +54,7 @@ class KanjiTrainer:
         self.root.config(menu=menubar)
         
     def display_props(self):
+        self.cancel_after()
         Properties(self, self.root)
         
     def centre_window(self):
@@ -78,6 +81,9 @@ class KanjiTrainer:
 
         self.logic = Logic(kanji)
         self.enable_buttons()
+        
+        if self.delay_active:
+            self.after = self.root.after(self.reveal_delay, self.step)
 
     def enable_buttons(self):
         print 'enabling buttons'
@@ -88,19 +94,30 @@ class KanjiTrainer:
                 item.config(state='normal')
                                          
     def kbd_next(self, event):
-        print self.delay_active, self.reveal_delay
+        self.cancel_after()
         if not self.logic:
             return
+        self.step()
+        
+    def step(self):
         if self.revealed:
             self.next()
         else:
             self.reveal()
+        if self.delay_active:
+            self.after = self.root.after(self.reveal_delay, self.step)
 
+    def cancel_after(self):
+        if self.after:
+            self.root.after_cancel(self.after)
+        
     def next(self):
+        self.cancel_after()
         self.revealed = False
         self.display(self.canvas, self.logic.next_kanji())
 
     def reveal(self):
+        self.cancel_after()
         self.revealed = True
         self.canvas.itemconfigure('hiragana', state='normal')
     
@@ -125,11 +142,11 @@ class Properties():
         self.prop.resizable(width=False, height=False)
         
         self.app = Button(self.prop, text='Apply', command=self.apply_settings)
-        self.app.grid(row=3, column=1, sticky='E')
-        self.app = Button(self.prop, text='OK', command=self.ok)
-        self.app.grid(row=3, column=1, sticky='E')
+        self.app.grid(row=3, columnspan=1, sticky='E')
+        self.ok = Button(self.prop, text='OK', command=self.ok, state='disabled')
+        self.ok.grid(row=3, column=1, sticky='E')
         self.can = Button(self.prop, text='Cancel', command=self.prop.destroy)
-        self.can.grid(row=3, column=2)
+        self.can.grid(row=3, column=2, sticky='E')
         
         validate = (self.prop.register(self.validate_props), '%i')
         self.rve = Entry(self.prop, validate='key', width=5, vcmd=validate, state='disabled')
@@ -166,15 +183,17 @@ class Properties():
         if self.reveal_chk.get() is not 0:
             time = self.rve.get()
             try:
-                int(time)
+                time = int(time)
             except ValueError:
                 tkMessageBox.showwarning('Set delay', 'Delay must be a number.', parent=self.prop)
                 return
-            self.reveal_delay = time
+            self.reveal_delay = time * 1000
             self.delay_active = True
+            self.ok.config(state='normal')
         else:
             self.reveal_delay = -1
             self.delay_active = False
+        
 
 class Logic():
     
