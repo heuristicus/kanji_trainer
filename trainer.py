@@ -31,6 +31,7 @@ class KanjiTrainer:
         self.revealed = False
         self.logic = None
         self.after = None
+        self.props = None
         
     def make_buttons(self):
         nxt = Button(self.root, text='Next', command=self.next, state='disabled')
@@ -55,7 +56,10 @@ class KanjiTrainer:
         
     def display_props(self):
         self.cancel_after()
-        Properties(self, self.root)
+        if not self.props:
+            self.props = Properties(self, self.root)
+        else:
+            self.props.display()
         
     def centre_window(self):
         window_height = self.root.winfo_screenheight()
@@ -138,6 +142,7 @@ class Properties():
     
     def __init__(self, parent, root):
         self.parent = parent # reference to the object that spawned this
+        self.root = root
         self.prop = Toplevel(root)
         self.prop.resizable(width=False, height=False)
         
@@ -157,8 +162,15 @@ class Properties():
         self.chk = Checkbutton(self.prop, text="Automatically reveal", variable=self.reveal_chk, command=self.rev_timer)
         self.chk.grid(row=0, columnspan=2)
 
-        self.prop.geometry('+%d+%d'%(root.winfo_rootx(), root.winfo_rooty()))
+        self.display()
 
+    def display(self):
+        """Displays the properties again with the same values after
+        the properties window has been closed."""
+        if self.prop.state() == "withdrawn":
+            self.prop.deiconify()
+        else:
+            self.prop.geometry('+%d+%d'%(self.root.winfo_rootx(), self.root.winfo_rooty()))
 
     def rev_timer(self):
         """Called when the automatically reveal checkbox is ticked in
@@ -177,7 +189,7 @@ class Properties():
     def ok(self):
         self.parent.reveal_delay = self.reveal_delay
         self.parent.delay_active = self.delay_active
-        self.prop.destroy()
+        self.prop.withdraw()
 
     def apply_settings(self):
         if self.reveal_chk.get() is not 0:
