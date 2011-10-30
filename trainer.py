@@ -123,7 +123,10 @@ class KanjiTrainer:
     def reveal(self):
         self.cancel_after()
         self.revealed = True
-        self.canvas.itemconfigure('hiragana', state='normal')
+        if self.invert_reveal == 1:
+            self.canvas.itemconfigure('kanji', state='normal')
+        else:
+            self.canvas.itemconfigure('hiragana', state='normal')
     
     def display(self, canvas, kanji):
         big = ('Meiryo', 90, 'normal')
@@ -135,8 +138,14 @@ class KanjiTrainer:
         for h in kanji[1:]:
             disp += '%s\n'%(h)
         canvas.delete('all')
-        canvas.create_text(cwidth/2, cheight/4, text=k, font=big, tags='kanji')
-        canvas.create_text(cwidth/2, cheight/2 - 20, text=disp, font=small, tags='hiragana', state='hidden', anchor='n')
+        
+        # State for the text to start in depends on the value set in
+        # the properties
+        k_state = 'hidden' if self.invert_reveal == 1 else 'normal'
+        h_state = 'hidden' if self.invert_reveal == 0 else 'normal'
+
+        canvas.create_text(cwidth/2, cheight/4, text=k, font=big, tags='kanji', state=k_state)
+        canvas.create_text(cwidth/2, cheight/2 - 20, text=disp, font=small, tags='hiragana', state=h_state, anchor='n')
 
 class Properties():
     
@@ -159,8 +168,11 @@ class Properties():
         self.revdel = Label(self.prop, text='Reveal delay:')
         self.revdel.grid(row=1, column=0, sticky='E')
         self.reveal_chk = IntVar()
-        self.chk = Checkbutton(self.prop, text="Automatically reveal", variable=self.reveal_chk, command=self.rev_timer)
-        self.chk.grid(row=0, columnspan=2)
+        self.auto_rev_chk = Checkbutton(self.prop, text="Automatically reveal", variable=self.reveal_chk, command=self.rev_timer)
+        self.auto_rev_chk.grid(row=0, columnspan=2)
+        self.reveal_inv = IntVar()
+        self.inv_rev = Checkbutton(self.prop, text="Show Hiragana first", variable=self.reveal_inv)
+        self.inv_rev.grid(row=2, columnspan=2)
 
         self.display()
 
@@ -189,6 +201,7 @@ class Properties():
     def ok(self):
         self.parent.reveal_delay = self.reveal_delay
         self.parent.delay_active = self.delay_active
+        self.parent.invert_reveal = self.reveal_inv.get()
         self.prop.withdraw()
 
     def apply_settings(self):
@@ -205,7 +218,7 @@ class Properties():
         else:
             self.reveal_delay = -1
             self.delay_active = False
-        
+            self.ok.config(state='normal')
 
 class Logic():
     
