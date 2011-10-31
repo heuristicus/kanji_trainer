@@ -1,11 +1,8 @@
 Currently only works with the Meiryo font, which should be available as a free download for Windows users at http://www.microsoft.com/download/en/details.aspx?id=10550
 
-# Likely future features:
+## Future features:
 
-- *\*DONE\** Automatically reveal hiragana after some time
-- *\*DONE\** Choose whether hiragana or kanji is initially revealed
-- *\*DONE\** Something better than choosing entirely randomly which item to display next
-- Improvements to the 
+- Improvements to the item selection method.
 - Specify a number of items to go through in a session
 - Method of parsing in a structured file that the user has created
 - Selection of items in the file that you want to work on
@@ -15,3 +12,9 @@ Currently only works with the Meiryo font, which should be available as a free d
 - Pausing
 - Keep session statistics (items viewed, if answering implemented, correct percentage, time taken etc.)
 - Font selection
+
+## Completed features
+
+- Automatically reveal hiragana after some time
+- Choose whether hiragana or kanji is initially revealed
+- Something better than choosing entirely randomly which item to display next
