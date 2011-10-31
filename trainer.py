@@ -223,10 +223,32 @@ class Logic():
     
     def __init__(self, kanji_list):
         self.kanji = kanji_list
+        # List to store number of times each kanji has been displayed
+        # so far, and the weight of that kanji.
+        self.data_list = [[0,1]] * len(kanji_list)
 
     def next_kanji(self):
+        return self.random_kanji()
+        
+    def random_kanji(self):
         return self.kanji[random.randint(0,len(self.kanji) - 1)]
 
+    def weighted_kanji(self):
+        self.update_weights()
+        self.stack = [reduce(lambda x, y: x + y, [d_item[1] for d_item in self.data_list][:i+1]) for i, item in enumerate(self.data_list)]
+        print self.stack
+        #for item in self.data_list:
+         #   print item
+    
+    def update_weights(self):
+        # Total number of times data items have been displayed
+        self.total_displayed = sum([data[0] for data in self.data_list])
+        # Update the data list, updating the weight of each data item.
+        self.data_list = map(self.display_based_update, self.data_list)
+
+    def display_based_update(self, item):
+        return [item[0], self.total_displayed / (item[0] + 1)]
+            
 def main():
     kfile = ''
     try:
