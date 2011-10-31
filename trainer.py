@@ -116,7 +116,7 @@ class KanjiTrainer:
     def next(self):
         self.cancel_after()
         self.revealed = False
-        self.display(self.canvas, self.logic.next_kanji())
+        self.display(self.canvas, self.logic.next_item())
 
     def reveal(self):
         self.cancel_after()
@@ -221,34 +221,57 @@ class Properties():
 
 class Logic():
     
-    def __init__(self, kanji_list):
-        self.kanji = kanji_list
-        # List to store number of times each kanji has been displayed
-        # so far, and the weight of that kanji.
-        self.data_list = [[0,1]] * len(kanji_list)
+    def __init__(self, item_list):
+        self.items = item_list
+        # List to store number of times each item has been displayed
+        self.disp_num = [0] * len(self.items)
+        #self.disp_num = [5,4,3,2,1]
+        # Item weight
+        self.weights = []
+        #self.weights = [0,0,0,0,0]
 
-    def next_kanji(self):
-        return self.random_kanji()
+    def next_item(self):
+        return self.weighted_item()
         
-    def random_kanji(self):
-        return self.kanji[random.randint(0,len(self.kanji) - 1)]
+    def random_item(self):
+        return self.items[random.randint(0,len(self.items) - 1)]
 
-    def weighted_kanji(self):
+    def weighted_item(self):
         self.update_weights()
-        self.stack = [reduce(lambda x, y: x + y, [d_item[1] for d_item in self.data_list][:i+1]) for i, item in enumerate(self.data_list)]
-        print self.stack
-        #for item in self.data_list:
-         #   print item
-    
-    def update_weights(self):
-        # Total number of times data items have been displayed
-        self.total_displayed = sum([data[0] for data in self.data_list])
-        # Update the data list, updating the weight of each data item.
-        self.data_list = map(self.display_based_update, self.data_list)
+        #print 'rewt', self.weights
+        #print self.disp_num
+        # Creates a list to be used to probabilistically select data
+        # items. Given the list [[1,2][3,4][5,6][7,8]], will produce
+        # [2,6,12,20]. For each index sums the values of all the
+        # preceding second list indices in the smaller lists.
+        self.stack = [reduce(lambda x, y: x + y, self.weights[:i + 1]) for i, item in enumerate(self.weights)]
+        rand = random.randint(0, sum(self.weights) - 1)
+        
+        disp_item = self.fgt(rand, self.stack)
+        self.disp_num[disp_item] += 1
+        return self.items[disp_item]
+        
 
-    def display_based_update(self, item):
-        return [item[0], self.total_displayed / (item[0] + 1)]
-            
+    def fgt(self, number, lst):
+        """Find the first index in the list which contains a value
+        greater than the number given"""
+        for i, item in enumerate(lst):
+            if item > number:
+                return i
+        
+    def update_weights(self):
+        if not self.weights:
+            self.weights = [1] * len(self.items)
+        else:
+            # Total number of times data items have been displayed
+            self.total_displayed = sum(self.disp_num)
+            # Update the data list, updating the weight of each data item.
+            #print 'inwt', self.weights
+            self.weights = map(self.display_based_update, self.disp_num)
+
+    def display_based_update(self, disp_num):
+        return self.total_displayed / (disp_num + 1)
+
 def main():
     kfile = ''
     try:
