@@ -8,7 +8,6 @@ class KanjiTrainer:
     def __init__(self, fname=''):
         self.create_gui()
         if fname:
-            print 'opening'
             self.open_file(fname)
         mainloop()
         
@@ -29,15 +28,14 @@ class KanjiTrainer:
         self.delay_active = False
         self.reveal_delay = -1
         self.revealed = False
+        self.invert_reveal = 0
         self.logic = None
         self.after = None
         self.props = None
         
     def make_buttons(self):
-        nxt = Button(self.root, text='Next', command=self.next, state='disabled')
-        nxt.pack()
-        rev = Button(self.root, text='Reveal', command=self.reveal, state='disabled')
-        rev.pack()
+        step = Button(self.root, text='Step', command=self.step, state='disabled')
+        step.pack()
         
     def make_menus(self):
         menubar = Menu(self.root)
@@ -90,12 +88,12 @@ class KanjiTrainer:
             self.after = self.root.after(self.reveal_delay, self.step)
 
     def enable_buttons(self):
-        print 'enabling buttons'
         obj = self.root.__dict__.get('children')
         for key in obj:
             item = obj[key]
             if item.__class__.__name__ is 'Button':
                 item.config(state='normal')
+        self.next()
                                          
     def kbd_next(self, event):
         self.cancel_after()
@@ -202,6 +200,7 @@ class Properties():
         self.parent.reveal_delay = self.reveal_delay
         self.parent.delay_active = self.delay_active
         self.parent.invert_reveal = self.reveal_inv.get()
+        self.parent.step() # Step to the next thing to start the automatic step going
         self.prop.withdraw()
 
     def apply_settings(self):
