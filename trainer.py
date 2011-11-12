@@ -10,7 +10,7 @@ class KanjiTrainer:
         if fname:
             self.open_file(fname)
         mainloop()
-        
+                
     def create_gui(self):
         self.root = Tk()
         self.root.title('Kanji Trainer')
@@ -32,10 +32,13 @@ class KanjiTrainer:
         self.logic = None
         self.after = None
         self.props = None
-        
+        self.paused = False
+
     def make_buttons(self):
-        step = Button(self.root, text='Step', command=self.step, state='disabled')
-        step.pack()
+        self.step_btn = Button(self.root, text='Step', command=self.step, state='disabled')
+        self.step_btn.pack()
+        self.pause_btn = Button(self.root, text='Pause', command=self.pause, state='disabled')
+        self.pause_btn.pack()
         
     def make_menus(self):
         menubar = Menu(self.root)
@@ -107,8 +110,22 @@ class KanjiTrainer:
         else:
             self.reveal()
         if self.delay_active:
-            self.after = self.root.after(self.reveal_delay, self.step)
+            self.after = self.start_after(self.reveal_delay, self.step)
+            #self.after_start = 
 
+    def pause(self):
+        if not self.paused:
+            self.paused = True
+            self.pause_btn.config(text='Unpause')
+            self.cancel_after()
+        else:
+            self.paused = False
+            self.pause_btn.config(text='Pause')
+            self.start_after(self.reveal_delay, self.step)
+                
+    def start_after(self, delay, callback):
+        return self.root.after(delay, callback)
+    
     def cancel_after(self):
         if self.after:
             self.root.after_cancel(self.after)
@@ -225,6 +242,8 @@ class Logic():
         self.items = item_list
         # List to store number of times each item has been displayed
         self.disp_num = [0] * len(self.items)
+        # Number of steps that have passed since each item was displayed
+        self.last_displayed = [0] * len(self.items)
         #self.disp_num = [5,4,3,2,1]
         # Item weight
         self.weights = []
@@ -249,8 +268,19 @@ class Logic():
         
         disp_item = self.fgt(rand, self.stack)
         self.disp_num[disp_item] += 1
+
+        print ' '.join([item[0] for item in self.items])
+        print self.disp_num, '#'
+        print self.last_displayed, 'last'
+        print self.weights
+
+        self.last_disp_update(disp_item)
         return self.items[disp_item]
-        
+    
+    def last_disp_update(self, item):
+        """Updates the displayed item list to reflect the new state."""
+        self.last_displayed = map(lambda x: x + 1, self.last_displayed)
+        self.last_displayed[item] = 0
 
     def fgt(self, number, lst):
         """Find the first index in the list which contains a value
