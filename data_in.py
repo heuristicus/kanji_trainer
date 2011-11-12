@@ -11,44 +11,50 @@ class Reader():
         self.root = Tk()
         self.root.title('datain')
 
-        self.init_vars()
-        self.init_boxes()
-        self.init_buttons()
+        print 'a'
 
+        self.init_vars()
+        print 'b'
+        self.init_buttons()
+        print 'c'
+        self.init_boxes()
+        
         mainloop()
         
     def init_vars(self):
         self.to_write = []
         self.current = [[] for i in range(4)]
+        print 'vars'
     
     def init_buttons(self):
-        self.next = Button(self.root, text='Next', callback=self.next_entry)
-        self.next.pack()
-
+        print 'buttons'
+        self.next = Button(self.root, text='Next', command=self.next_entry, state='normal')
+        self.next.grid(row=4, column=3, sticky='N')
+        
     def init_boxes(self):
         self.one = Entry(self.root)
         self.one.bind('<Tab>', self.tab_on_one)
         self.one.bind('<Return>', self.ret_on_one)
         self.one.bind('<Button-1>', self.mouse_on_one)
-        self.one.pack()
+        self.one.grid(row=0, column=3, sticky='W')
         
         self.two = Entry(self.root)
         self.two.bind('<Tab>', self.tab_on_two)
         self.two.bind('<Return>', self.ret_on_two)
         self.two.bind('<Button-1>', self.mouse_on_two)
-        self.two.pack()
+        self.two.grid(row=1, column=3, sticky='W')
 
         self.thr = Entry(self.root)
         self.thr.bind('<Tab>', self.trd)
         self.thr.bind('<Return>', self.tre)
         self.thr.bind('<Button-1>', self.thrfoc)
-        self.thr.pack()
+        self.thr.grid(row=2, column=3, sticky='W')
 
         self.fr = Entry(self.root)
         self.fr.bind('<Tab>', self.fth)
         self.fr.bind('<Return>', self.fte)
         self.fr.bind('<Button-1>', self.frfoc)
-        self.fr.pack()
+        self.fr.grid(row=3, column=3, sticky='W')
 
     def next_entry(self):
         if self.is_disabled(self.one):
@@ -73,9 +79,6 @@ class Reader():
 
     def is_disabled(self, obj):
         return True if obj['state'] == 'disabled' or obj['state'] == 'hidden' else False
-
-    def init_buttons(self):
-        print 'not done'
 
     def mouse_on_one(self, event):
         print 'mouse on one'
