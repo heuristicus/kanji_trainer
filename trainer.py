@@ -85,18 +85,27 @@ class KanjiTrainer:
             kanji.append(k_set.split(' '))
 
         self.logic = Logic(kanji)
-        self.enable_buttons()
+        self.enable_non_context_buttons()
         
         if self.delay_active:
             self.after = self.root.after(self.reveal_delay, self.step)
 
-    def enable_buttons(self):
+    def enable_all_buttons(self):
         obj = self.root.__dict__.get('children')
         for key in obj:
             item = obj[key]
             if item.__class__.__name__ is 'Button':
                 item.config(state='normal')
         self.next()
+
+    def enable_non_context_buttons(self):
+        """Enable buttons which are not affected by any property being changed"""
+        self.step_btn.config(state='normal')
+        self.next()
+
+    def enable_context_buttons(self):
+        """Enable buttons which are affected by properties being changed"""
+        self.pause_btn.config(state='normal' if self.delay_active else 'disabled')
                                          
     def kbd_next(self, event):
         self.cancel_after()
@@ -114,6 +123,9 @@ class KanjiTrainer:
             #self.after_start = 
 
     def pause(self):
+        if not self.delay_active:
+            return
+
         if not self.paused:
             self.paused = True
             self.pause_btn.config(text='Unpause')
@@ -218,6 +230,7 @@ class Properties():
         self.parent.delay_active = self.delay_active
         self.parent.invert_reveal = self.reveal_inv.get()
         self.parent.step() # Step to the next thing to start the automatic step going
+        self.parent.enable_context_buttons()
         self.prop.withdraw()
 
     def apply_settings(self):
