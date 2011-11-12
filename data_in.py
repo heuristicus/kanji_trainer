@@ -51,11 +51,12 @@ class Reader():
         self.fr.pack()
 
     def next_entry(self):
-        if is_disabled(self.one):
-            self.one.config(state='enabled')
+        if self.is_disabled(self.one):
+            self.one.config(state='normal')
         self.to_write.append(self.current)
         self.current = [[] for i in range(4)]
         self.one.focus_set()
+        print self.to_write
         
     def next_box(self, cur_box, box_no):
         self.save_box_contents(cur_box, box_no)
@@ -71,7 +72,7 @@ class Reader():
         box.delete(0, END)
 
     def is_disabled(self, obj):
-        return True if obj.state == 'disabled' or obj.state == 'hidden' else False
+        return True if obj['state'] == 'disabled' or obj['state'] == 'hidden' else False
 
     def init_buttons(self):
         print 'not done'
