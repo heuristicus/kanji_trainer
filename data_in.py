@@ -18,8 +18,13 @@ class Reader():
         mainloop()
         
     def init_vars(self):
-        self.to_write = [[] for i in range(4)]
+        self.to_write = []
+        self.current = [[] for i in range(4)]
     
+    def init_buttons(self):
+        self.next = Button(self.root, text='Next', callback=self.next_entry)
+        self.next.pack()
+
     def init_boxes(self):
         self.one = Entry(self.root)
         self.one.bind('<Tab>', self.tab_on_one)
@@ -45,6 +50,26 @@ class Reader():
         self.fr.bind('<Button-1>', self.frfoc)
         self.fr.pack()
 
+    def next_entry(self):
+        if is_disabled(self.one):
+            self.one.config(state='enabled')
+        self.to_write.append(self.current)
+        self.current = [[] for i in range(4)]
+        self.one.focus_set()
+        
+    def next_box(self, cur_box, box_no):
+        self.save_box_contents(cur_box, box_no)
+
+    def save_box_contents(self, box, box_no):
+        data = box.get()
+        if data != '':
+            self.current[box_no].append(data)
+        self.clear_box(box)
+        print self.current
+
+    def clear_box(self, box):
+        box.delete(0, END)
+
     def is_disabled(self, obj):
         return True if obj.state == 'disabled' or obj.state == 'hidden' else False
 
@@ -56,49 +81,48 @@ class Reader():
     
     def ret_on_one(self, event):
         print 'ret 1'
-        self.to_write[0] = self.one.get()
+        self.next_box(self.one, 0)
         self.one.config(state='disabled')
-        print self.to_write
-        
+        self.two.focus_set()
+               
     def tab_on_one(self, event):
         print 'tab on first focus'
+        self.next_box(self.one, 0)
 
     def ret_on_two(self, event):
         print 'ret on 2'
-        self.to_write[1].append(self.two.get())
-        self.two.delete(0, END)
-        print self.to_write
-
+        self.save_box_contents(self.two, 1)
+       
     def tab_on_two(self, event):
         print 'tab on 2'
+        self.next_box(self.two, 1)
         
     def mouse_on_two(self, event):
         print 'mouse 2'
 
     def trd(self, event):
         print 'tab 3'
+        self.next_box(self.thr, 2)
         
     def tre(self, event):
         print 'ret 3'
-        self.to_write[2].append(self.thr.get())
-        self.thr.delete(0, END)
-        print self.to_write
+        self.save_box_contents(self.thr, 2)
 
     def thrfoc(self, event):
         print 'mouse 3'
 
     def fth(self, event):
         print 'tab 4'
+        self.save_box_contents(self.fr, 3)
+        self.next_entry()
 
     def fte(self, event):
         print 'ret 4'
-        self.to_write[3].append(self.fr.get())
-        self.fr.delete(0, END)
-        print self.to_write
+        self.save_box_contents(self.fr, 3)
+
 
     def frfoc(self, event):
         print 'mouse 4'
-
-
+        
 if __name__ == '__main__':
     Reader()
