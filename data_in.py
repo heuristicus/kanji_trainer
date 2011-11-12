@@ -1,22 +1,19 @@
 #! /usr/bin/python
 from Tkinter import *
+import tkFileDialog
 
 class Reader():
 
 ## Make entered data appear to the right or left of the text boxes so the user can see it
 ## make it so that the number of boxes that appear are pre specified and the user can select how many they want. Automatically initialise callback methods and stuff using lambda functions
-## 
+## allow returning to previous entries
     
     def __init__(self):
         self.root = Tk()
         self.root.title('datain')
 
-        print 'a'
-
         self.init_vars()
-        print 'b'
         self.init_buttons()
-        print 'c'
         self.init_boxes()
         
         mainloop()
@@ -24,12 +21,13 @@ class Reader():
     def init_vars(self):
         self.to_write = []
         self.current = [[] for i in range(4)]
-        print 'vars'
-    
+        self.inner_separator = ' '
+        self.top_separator = ';'
     def init_buttons(self):
-        print 'buttons'
-        self.next = Button(self.root, text='Next', command=self.next_entry, state='normal')
+        self.next = Button(self.root, text='Next', command=self.next_entry, takefocus=False, state='normal')
         self.next.grid(row=4, column=3, sticky='N')
+        self.save = Button(self.root, text='Save', command=self.save_to_file, takefocus=False)
+        self.save.grid(row=6, column=3, sticky='S')
         
     def init_boxes(self):
         self.one = Entry(self.root)
@@ -55,6 +53,23 @@ class Reader():
         self.fr.bind('<Return>', self.fte)
         self.fr.bind('<Button-1>', self.frfoc)
         self.fr.grid(row=3, column=3, sticky='W')
+
+    def save_to_file(self):
+        ## This is probably slow
+        f = tkFileDialog.asksaveasfilename()
+        fle = open(f, 'a')
+        
+        print 'save meee'
+        
+        top_delimited = ''
+        for ilist in self.to_write:
+            delimited = []
+            for slist in ilist:
+                delimited.append(self.inner_separator.join(slist))
+            top_delimited += self.top_separator.join(delimited)
+            
+        print top_delimited
+        fle.close()
 
     def next_entry(self):
         if self.is_disabled(self.one):
@@ -92,6 +107,7 @@ class Reader():
     def tab_on_one(self, event):
         print 'tab on first focus'
         self.next_box(self.one, 0)
+        self.one.config(state='disabled')
 
     def ret_on_two(self, event):
         print 'ret on 2'
