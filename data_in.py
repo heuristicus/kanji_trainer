@@ -34,16 +34,23 @@ class Reader():
         for num in range(num_boxes):
             self.boxarr.append(self.make_box(num))
         print self.boxarr
+        for num in range(num_boxes):
+            self.bind_box_methods(self.boxarr[num], num)
 
     def make_box(self, num):
         box = Entry(self.root)
         return box
 
     def bind_box_methods(self, box, num):
-        #box.bind('<Tab>', (lambda self, box, event: self.next_box(box, num) self.boxarr[num+1].focus_set())
-        #box.bind('<Return>', self.ret_on_one)
+        if num == 0:
+            box.bind('<Tab>', (lambda self, box, event: self.next_box(box, num), box.config(state='disabled')))
+        elif num == len(self.boxarr) - 1:
+            box.bind('<Tab>', (lambda self, box, event: self.save_box_contents(box, num), self.next_entry())) 
+        else:
+            box.bind('<Tab>', (lambda self, box, event: self.next_box(box, num)))
+        #box.bind('<Return>', (lambda self, box, event: self.next_box(box, num), box.config(state='disabled'), self.boxarr[num+1].focus_set()))  
         #box.bind('<Button-1>', self.mouse_on_one)
-        #box.grid(row=num, column=3, sticky="W")
+        box.grid(row=num, column=3, sticky="W")
         print 'a'
 
     def init_boxes(self):
@@ -89,11 +96,11 @@ class Reader():
         fle.close()
 
     def next_entry(self):
-        if self.is_disabled(self.one):
-            self.one.config(state='normal')
+        if self.is_disabled(self.boxarr[0]):
+            self.boxarr[0].config(state='normal')
         self.to_write.append(self.current)
         self.current = [[] for i in range(4)]
-        self.one.focus_set()
+        self.boxarr[0].focus_set()
         print self.to_write
         
     def next_box(self, cur_box, box_no):
