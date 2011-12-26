@@ -14,8 +14,8 @@ class Reader():
 
         self.init_vars()
         self.init_buttons()
-        self.init_boxes()
-        
+        #self.init_boxes()
+        self.generic_init_boxes(4)
         mainloop()
         
     def init_vars(self):
@@ -28,7 +28,24 @@ class Reader():
         self.next.grid(row=4, column=3, sticky='N')
         self.save = Button(self.root, text='Save', command=self.save_to_file, takefocus=False)
         self.save.grid(row=6, column=3, sticky='S')
-        
+
+    def generic_init_boxes(self, num_boxes):
+        self.boxarr = []
+        for num in range(num_boxes):
+            self.boxarr.append(self.make_box(num))
+        print self.boxarr
+
+    def make_box(self, num):
+        box = Entry(self.root)
+        return box
+
+    def bind_box_methods(self, box, num):
+        #box.bind('<Tab>', (lambda self, box, event: self.next_box(box, num) self.boxarr[num+1].focus_set())
+        #box.bind('<Return>', self.ret_on_one)
+        #box.bind('<Button-1>', self.mouse_on_one)
+        #box.grid(row=num, column=3, sticky="W")
+        print 'a'
+
     def init_boxes(self):
         self.one = Entry(self.root)
         self.one.bind('<Tab>', self.tab_on_one)
