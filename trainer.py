@@ -33,6 +33,7 @@ class KanjiTrainer:
         self.after = None
         self.props = None
         self.paused = False
+        self.selection_method = 'STR'
 
     def make_buttons(self):
         self.step_btn = Button(self.root, text='Step', command=self.step, state='disabled')
@@ -89,6 +90,7 @@ class KanjiTrainer:
         
         if self.delay_active:
             self.after = self.root.after(self.reveal_delay, self.step)
+        fle.close()
 
     def enable_all_buttons(self):
         obj = self.root.__dict__.get('children')
@@ -106,7 +108,7 @@ class KanjiTrainer:
     def enable_context_buttons(self):
         """Enable buttons which are affected by properties being changed"""
         self.pause_btn.config(state='normal' if self.delay_active else 'disabled')
-                                         
+                                        
     def kbd_next(self, event):
         self.cancel_after()
         if not self.logic:
@@ -145,7 +147,7 @@ class KanjiTrainer:
     def next(self):
         self.cancel_after()
         self.revealed = False
-        self.display(self.canvas, self.logic.next_item())
+        self.display(self.canvas, self.logic.next_item(self.selection_method))
 
     def reveal(self):
         self.cancel_after()
@@ -261,10 +263,23 @@ class Logic():
         # Item weight
         self.weights = []
         #self.weights = [0,0,0,0,0]
+        self.ptr = -1 #pointer for going through list
 
-    def next_item(self):
-        return self.weighted_item()
-        
+    def next_item(self, method):
+        if method == 'STR':
+            return self.straight()
+        elif method == 'RND':
+            return self.random_item()
+        elif method == 'WTD':
+            return weighted_item()
+
+    def straight(self):
+        # Goes through the list from start to end, and loops.
+        self.ptr += 1
+        return self.items[self.ptr % len(self.items)]
+
+
+
     def random_item(self):
         return self.items[random.randint(0,len(self.items) - 1)]
 
